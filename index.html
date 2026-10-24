@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>싸이월드 미니홈피 - 금성제 & 나백진</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Dotum', '돋움', 'Gulim', '굴림', sans-serif;
+      font-size: 12px;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #a3c2c2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 0;
+    }
+
+    .main-bg {
+      background: #80aaff;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    .mini-frame {
+      background: #ffffff;
+      border: 2px dashed #3a8bb1;
+      border-radius: 10px;
+      padding: 15px;
+      width: 880px;
+      height: 580px;
+      position: relative;
+    }
+
+    .view-screen {
+      display: none;
+      height: 100%;
+    }
+
+    .view-screen.active {
+      display: block;
+    }
+
+    /* 인물 선택 화면 */
+    .selection-title {
+      text-align: center;
+      margin-top: 35px;
+      margin-bottom: 35px;
+    }
+
+    .selection-title h2 {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .selection-title p {
+      color: #666;
+      font-size: 12px;
+    }
+
+    .card-grid {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .character-card {
+      width: 190px;
+      background: #fdfdfd;
+      border: 1px solid #d1d1d1;
+      border-radius: 8px;
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .character-card:hover {
+      transform: translateY(-4px);
+      border-color: #3a8bb1;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .card-avatar {
+      width: 120px;
+      height: 130px;
+      background: #f0f4f8;
+      border-radius: 6px;
+      margin: 0 auto 12px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #e1e8ed;
+      overflow: hidden;
+    }
+
+    .card-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .card-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: #222;
+      margin-bottom: 5px;
+    }
+
+    .card-name span {
+      font-size: 11px;
+      color: #777;
+      font-weight: normal;
+    }
+
+    .card-status {
+      font-size: 11px;
+      color: #d97706;
+      background: #fffbe2;
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: inline-block;
+      border: 1px solid #fef3c7;
+    }
+
+    /* 미니홈피 레이아웃 */
+    .cy-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .cy-header {
+      display: flex;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .nav-back {
+      font-weight: bold;
+      color: #2b6cb0;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+
+    .nav-back:hover {
+      text-decoration: underline;
+    }
+
+    .visitor-counter {
+      font-size: 11px;
+      color: #666;
+    }
+
+    .today-cnt { color: #e53e3e; font-weight: bold; }
+
+    .homepy-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #2b6cb0;
+      margin-left: 20px;
+    }
+
+    .url-text {
+      margin-left: auto;
+      font-size: 11px;
+      color: #888;
+    }
+
+    .cy-book-wrapper {
+      display: flex;
+      flex: 1;
+      margin-top: 10px;
+    }
+
+    /* 좌측 프로필 영역 */
+    .left-section {
+      width: 200px;
+      border: 1px solid #c5d8e1;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .today-is-box {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 4px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .profile-img-container {
+      width: 100%;
+      height: 160px;
+      background: #ffffff;
+      border: 1px solid #d5dfd7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .profile-img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .profile-desc {
+      font-size: 11px;
+      color: #444;
+      line-height: 1.4;
+      height: 70px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      background: #fff;
+      padding: 5px;
+      border: 1px solid #eee;
+    }
+
+    .profile-info {
+      border-top: 1px dashed #ccc;
+      padding-top: 6px;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    .ilchon-wave-box {
+      margin-top: auto;
+      background: #edf2f7;
+      padding: 6px;
+      border-radius: 4px;
+    }
+
+    .ilchon-title {
+      font-size: 11px;
+      font-weight: bold;
+      color: #2d3748;
+      margin-bottom: 4px;
+    }
+
+    .ilchon-wave-box select {
+      width: 100%;
+      padding: 2px;
+      font-size: 11px;
+    }
+
+    /* 우측 컨텐츠 영역 */
+    .right-section {
+      flex: 1;
+      border: 1px solid #c5d8e1;
+      border-radius: 6px;
+      margin-left: 8px;
+      padding: 12px;
+      background: #ffffff;
+      overflow-y: auto;
+      height: 490px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section-label {
+      font-weight: bold;
+      color: #2b6cb0;
+      border-bottom: 1px solid #3182ce;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    /* 홈 탭 - 미니룸 이미지 영역 확장 (260px) */
+    .miniroom-bg {
+      width: 100%;
+      height: 260px;
+      border: 1px solid #cbd5e0;
+      background: #f7fafc;
+      position: relative;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .miniroom-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .miniroom-caption {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      background: rgba(255,255,255,0.9);
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      border: 1px solid #cbd5e0;
+    }
+
+    .ilchon-list {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 8px;
+      max-height: 65px;
+      overflow-y: auto;
+    }
+
+    .ilchon-item {
+      padding: 2px 0;
+      font-size: 11px;
+    }
+
+    .ilchon-item .writer {
+      font-weight: bold;
+      color: #2b6cb0;
+    }
+
+    /* 방명록 탭 (익명 작성 전용 레이아웃) */
+    .guestbook-write-box {
+      background: #f7fafc;
+      border: 1px solid #cbd5e0;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+    }
+
+    .guest-writer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #2b6cb0;
+    }
+
+    .guestbook-write-box textarea {
+      width: 100%;
+      height: 60px;
+      border: 1px solid #ccc;
+      padding: 6px;
+      resize: none;
+      font-size: 11px;
+    }
+
+    .cy-btn {
+      background: #4299e1;
+      color: white;
+      border: none;
+      padding: 4px 12px;
+      cursor: pointer;
+      border-radius: 2px;
+      font-size: 11px;
+    }
+
+    .cy-btn:hover {
+      background: #3182ce;
+    }
+
+    .guest-item {
+      background: #fafafa;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 3px;
+    }
+
+    .guest-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #edf2f7;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
+      color: #718096;
+    }
+
+    .guest-name {
+      font-weight: bold;
+      color: #2b6cb0;
+    }
+
+    .guest-del-btn {
+      color: #e53e3e;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .tabs-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-left: 2px;
+      margin-top: 10px;
+    }
+
+    .tab-btn {
+      background: #3182ce;
+      color: white;
+      border: 1px solid #2b6cb0;
+      border-left: none;
+      padding: 8px 10px;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+      font-size: 11px;
+      width: 60px;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #2b6cb0;
+      font-weight: bold;
+      border-left: 1px solid #ffffff;
+    }
+
+    /* 클릭 차단 비활성화 탭 스타일 */
+    .tab-btn.disabled {
+      background: #a0aec0;
+      border-color: #718096;
+      color: #e2e8f0;
+      cursor: not-allowed;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-bg">
+    <div class="mini-frame">
+      <!-- 1. 인물 선택 메인 화면 -->
+      <div id="selection-screen" class="view-screen active">
+        <div class="selection-title">
+          <h2>누구의 미니홈피에 놀러갈까요?</h2>
+          <p>인물을 선택하면 싸이월드 미니홈피로 이동합니다</p>
+        </div>
+        <div class="card-grid">
+          <!-- 금성제 카드 -->
+          <div class="character-card" onclick="openHomepy('seongje')">
+            <div class="card-avatar" id="card-avatar-seongje"></div>
+            <div class="card-name">금성제 <span>(18)</span></div>
+            <div class="card-status">口ざㄴrnㅓ ㅂĿㄱr워.</div>
+          </div>
+
+          <!-- 나백진 카드 -->
+          <div class="character-card" onclick="openHomepy('baekjin')">
+            <div class="card-avatar" id="card-avatar-baekjin"></div>
+            <div class="card-name">나백진 <span>(18)</span></div>
+            <div class="card-status">설명ぁĦ○F돼?</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 미니홈피 메인 화면 -->
+      <div id="homepy-screen" class="view-screen">
+        <div class="cy-container">
+          <!-- 상단 영역 -->
+          <div class="cy-header">
+            <div class="nav-back" onclick="showSelection()">◀ 인물 선택으로 돌아가기</div>
+            <div class="visitor-counter">
+              TODAY <span class="today-cnt" id="today-cnt">382</span> | TOTAL <span id="total-cnt">19800</span>
+            </div>
+            <div class="homepy-title" id="homepy-title">금성제님의 미니홈피</div>
+            <div class="url-text" id="homepy-url">http://www.cyworld.com/seongje</div>
+          </div>
+
+          <div class="cy-book-wrapper">
+            <!-- 좌측 프로필 창 -->
+            <div class="left-section">
+              <div class="today-is-box">
+                TODAY IS... <span id="profile-feeling">⚡</span>
+              </div>
+              <div class="profile-img-container" id="left-avatar-img"></div>
+              <div class="profile-desc" id="profile-desc">하여간 존잼이라니까.</div>
+              <div class="profile-info">
+                <strong id="profile-name">금성제</strong> <span id="profile-gender-age">♂ 18</span>
+              </div>
+              <div class="ilchon-wave-box">
+                <div class="ilchon-title">일촌 파도타기</div>
+                <select id="ilchon-select" onchange="navigateIlchon(this.value)"></select>
+              </div>
+            </div>
+
+            <!-- 우측 메인 컨텐츠 창 -->
+            <div class="right-section">
+              <!-- 홈 탭 -->
+              <div id="tab-home" class="tab-content active">
+                <div class="section-label">Mini Room</div>
+                <div class="miniroom-bg" id="miniroom-bg"></div>
+
+                <div class="section-label">일촌평</div>
+                <div class="ilchon-list" id="ilchon-list"></div>
+              </div>
+
+              <!-- 방명록 탭 (익명 작성 전용) -->
+              <div id="tab-guest" class="tab-content">
+                <div class="section-label">GUESTBOOK (익명 방명록)</div>
+                <div class="guestbook-write-box">
+                  <div class="guest-writer-row">
+                    <span>작성자: 👤 익명</span>
+                  </div>
+                  <textarea id="guest-content" placeholder="익명으로 방명록 한마디를 적어보세요..."></textarea>
+                  <div style="text-align: right; margin-top: 6px;">
+                    <button class="cy-btn" onclick="addGuestbook()">확인</button>
+                  </div>
+                </div>
+
+                <div id="guestbook-list"></div>
+              </div>
+            </div>
+
+            <!-- 우측 탭 메뉴 (다이어리, 사진첩 클릭 막음 처리) -->
+            <div class="tabs-menu">
+              <button class="tab-btn active" onclick="switchTab('home', this)">홈</button>
+              <button class="tab-btn disabled" disabled>다이어리</button>
+              <button class="tab-btn disabled" disabled>사진첩</button>
+              <button class="tab-btn" onclick="switchTab('guest', this)">방명록</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 프로필 아바타 이미지
+    const imgSeongje = "https://i.postimg.cc/5y2Jp5kj/angyeong-sseun-pigsel-abata.png";
+    const imgBaekjin = "https://i.postimg.cc/SRvBrB9h/jung-ang-ui-pigsel-gyobog-kaeligteo.png";
+
+    // 미니룸 배경 이미지
+    const roomSeongje = "https://i.postimg.cc/Ghtmdrh9/saibeolum-sog-leteulo-geim-bam.png";
+    const roomBaekjin = "https://i.postimg.cc/T35q4Zzy/1d31854e-6ac2-4eea-8cff-035325e6c679.jpg";
+
+    const characters = {
+      seongje: {
+        id: "seongje",
+        name: "금성제",
+        age: 18,
+        feeling: "⚡",
+        today: 382,
+        total: 19800,
+        desc: "하여간 존잼이라니까.<br>오케이, 낭만 합격.",
+        speech: "나 당분간 좀 쉰다.",
+        image: imgSeongje,
+        miniroomHtml: `
+          <img src="${roomSeongje}" alt="금성제 미니룸">
+          <div class="miniroom-caption">"나 당분간 좀 쉰다."</div>
+        `,
+        ilchonList: [
+          { name: "나백진", text: "성제야, 박후민 얼굴 좀 보고오자." }
+        ]
+      },
+      baekjin: {
+        id: "baekjin",
+        name: "나백진",
+        age: 18,
+        feeling: "❄️",
+        today: 890,
+        total: 45200,
+        desc: "변수를 제거하면,<br>훨씬 빨라.",
+        speech: "우리 대포계좌 관리하는 건 나랑 너뿐이야.",
+        image: imgBaekjin,
+        miniroomHtml: `
+          <img src="${roomBaekjin}" alt="나백진 미니룸">
+          <div class="miniroom-caption">"우리 대포계좌 관리하는 건 나랑 너뿐이야."</div>
+        `,
+        ilchonList: [
+          { name: "금성제", text: "근데 이 씨발, 한 번을 안 물어보네? 괜찮냐고?" }
+        ]
+      }
+    };
+
+    let currentOwner = "seongje";
+
+    window.onload = function() {
+      document.getElementById("card-avatar-seongje").innerHTML = `<img src="${characters.seongje.image}" alt="금성제">`;
+      document.getElementById("card-avatar-baekjin").innerHTML = `<img src="${characters.baekjin.image}" alt="나백진">`;
+    };
+
+    function showSelection() {
+      document.getElementById("selection-screen").classList.add("active");
+      document.getElementById("homepy-screen").classList.remove("active");
+    }
+
+    function openHomepy(charId) {
+      currentOwner = charId;
+      const data = characters[charId];
+
+      document.getElementById("homepy-title").innerText = `${data.name}님의 미니홈피`;
+      document.getElementById("homepy-url").innerText = `http://www.cyworld.com/${data.id}`;
+      document.getElementById("today-cnt").innerText = data.today;
+      document.getElementById("total-cnt").innerText = data.total;
+      document.getElementById("profile-feeling").innerText = data.feeling;
+      document.getElementById("left-avatar-img").innerHTML = `<img src="${data.image}" alt="${data.name}">`;
+      document.getElementById("profile-desc").innerHTML = data.desc;
+      document.getElementById("profile-name").innerText = data.name;
+      document.getElementById("profile-gender-age").innerText = `♂ ${data.age}`;
+      document.getElementById("miniroom-bg").innerHTML = data.miniroomHtml;
+
+      const ilchonSelect = document.getElementById("ilchon-select");
+      ilchonSelect.innerHTML = `<option value="">--- 일촌 목록 ---</option>`;
+      Object.keys(characters).forEach(key => {
+        if (key !== charId) {
+          ilchonSelect.innerHTML += `<option value="${key}">${characters[key].name} (일촌)</option>`;
+        }
+      });
+
+      const ilchonBox = document.getElementById("ilchon-list");
+      ilchonBox.innerHTML = data.ilchonList.map(item => `
+        <div class="ilchon-item">• ${item.text} <span class="writer">(${item.name})</span></div>
+      `).join("");
+
+      renderGuestbook();
+      switchTab('home', document.querySelectorAll('.tab-btn')[0]);
+
+      document.getElementById("selection-screen").classList.remove("active");
+      document.getElementById("homepy-screen").classList.add("active");
+    }
+
+    function navigateIlchon(targetId) {
+      if (targetId) openHomepy(targetId);
+    }
+
+    function switchTab(tabName, btnElement) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+      if (btnElement) btnElement.classList.add('active');
+    }
+
+    function getStorageKey() {
+      return `cy_guestbook_${currentOwner}`;
+    }
+
+    function renderGuestbook() {
+      const key = getStorageKey();
+      const raw = localStorage.getItem(key);
+      let list = [];
+      if (raw) {
+        try { list = JSON.parse(raw); } catch(e) {}
+      }
+
+      const container = document.getElementById("guestbook-list");
+      if (list.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:#999; padding:25px;">아직 작성된 방명록이 없습니다.<br>첫 익명 방명록을 작성해보세요!</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map((item, index) => `
+        <div class="guest-item">
+          <div class="guest-header">
+            <div><span class="guest-name">익명</span> (${item.date})</div>
+            <div class="guest-del-btn" onclick="deleteGuestbook(${index})">삭제</div>
+          </div>
+          <div style="color:#333; line-height:1.4; white-space: pre-wrap;">${item.content}</div>
+        </div>
+      `).join("");
+    }
+
+    // 익명 방명록 추가 함수
+    function addGuestbook() {
+      const contentInput = document.getElementById("guest-content");
+      const content = contentInput.value.trim();
+
+      if (!content) {
+        alert("방명록 내용을 입력해주세요!");
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
+
+      const key = getStorageKey();
+      const raw = localStorage.getItem(key);
+      let list = raw ? JSON.parse(raw) : [];
+
+      // 항상 작성자를 '익명'으로 고정 저장
+      list.unshift({ writer: "익명", content, date: dateStr });
+      localStorage.setItem(key, JSON.stringify(list));
+
+      contentInput.value = "";
+      renderGuestbook();
+    }
+
+    function deleteGuestbook(index) {
+      const key = getStorageKey();
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+
+      let list = JSON.parse(raw);
+      list.splice(index, 1);
+      localStorage.setItem(key, JSON.stringify(list));
+      renderGuestbook();
+    }
+  </script>
+</body>
+</html>
